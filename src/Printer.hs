@@ -25,8 +25,8 @@ ppTerm t = case t of
                                                   <+> text "else" <+> ppTerm q
   TLet v l1 p q l -> label l $ text "let" <+> label l1 (text v) <+> text "="
                            <+> ppTerm p <+> text "in" <+> ppTerm q
-  TAs term tag    -> ppTerm term <+> text "as" <+> ppTag tag
-  TDrop term tag  -> ppTerm term <+> text "drop" <+> ppTag tag 
+  TAs term tag l  -> label l (ppTerm term <+> text "as" <+> ppTag tag)
+  TDrop term tag l-> label l (ppTerm term <+> text "drop" <+> ppTag tag)
   TLam v l1 ty t l -> label l $ text "\\" <> label l1 (text v) <+> text ":" 
                             <+> ppType ty <+> text "." <+> ppTerm t
   TBool True l      -> label l (text "true")

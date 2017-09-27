@@ -30,8 +30,8 @@ tTerm t env = case t of
     l1 <- get_label
     let env' = M.insert var l1 env
     L.TLet var l1 <$> tTerm p env {- let not recursive -} <*> tTerm q env' <*> get_label
-  P.TAs t tag -> L.TAs <$> tTerm t env <*> return tag
-  P.TDrop t tag -> L.TDrop <$> tTerm t env <*> return tag
+  P.TAs t tag -> L.TAs <$> tTerm t env <*> return tag <*> get_label
+  P.TDrop t tag -> L.TDrop <$> tTerm t env <*> return tag <*> get_label
   P.TLam var ty t -> do 
     l1 <- get_label
     let env' = M.insert var l1 env
