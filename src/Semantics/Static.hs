@@ -13,10 +13,21 @@ import Data.List (nub)
 type AnnHier  = M.Map Ann [Ann] 
 type Env      = M.Map Var Type
 
-typesOf :: Program -> [Type]
-typesOf (Program ds term) = apply_rules hier M.empty term 
-  where hier :: AnnHier
-        hier = foldr op M.empty ds
+typecheck :: Program -> Type -> Bool
+typecheck (Program ds t) = isOfType (gHierarchy ds) t
+  
+typings :: Program -> [Type]
+typings (Program ds t) = typesOf (gHierarchy ds) t
+
+isOfType :: AnnHier -> Term -> Type -> Bool
+isOfType hier term tyB = any compare (typesOf hier term)
+  where compare tyS = tyS `typeEq` tyB && gSubTagOp hier (tagOf tyS) (tagOf tyB)
+
+typesOf :: AnnHier -> Term -> [Type]
+typesOf hier term = apply_rules hier M.empty term 
+
+gHierarchy :: [Decl] -> AnnHier
+gHierarchy ds = foldr op M.empty ds
          where op (SecAnn a) = M.insertWith (++) a []
                op (SecAnnExt a2 a1) = M.insertWith (++) a1 [a2]
 
@@ -56,7 +67,8 @@ rule_app hier env term = case term of
     ty_arr <- apply_rules hier env t1 
     case ty_arr of  
       TyArrow ty1 ty2 s3  -> do ty3 <- apply_rules hier env t2
-                                guard (ty1 == ty3) -- structurally equal
+                                guard (ty1 `typeEq` ty3)
+                                guard (gSubTagOp hier (tagOf ty1) (tagOf ty3))
                                 return ty2
       _                 -> []
   _           -> []
@@ -101,8 +113,8 @@ rule_drop hier env term = case term of
 type TypeOp a = Tag -> Tag -> a -- answers `a1` inherits from `a2`?
 
 -- | Generates `<:` based on a hierarchy obtained from annotation declarations
-gSubtypeOp :: AnnHier -> TypeOp Bool
-gSubtypeOp hier p q = case (p,q) of
+gSubTagOp :: AnnHier -> TypeOp Bool
+gSubTagOp hier p q = case (p,q) of
   (Bot, _)                  -> True   -- implies Bot <: Bot
   (_, Bot)                  -> False
   (_, Top)                  -> True   -- implies Top <: Top

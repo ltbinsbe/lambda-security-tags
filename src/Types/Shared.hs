@@ -14,14 +14,12 @@ data Tag      = TgAnn Ann
               | TgProd Tag Tag
               | Top
               | Bot
-              deriving (Eq)
 
 data Type     = TyArrow Type Type Tag 
               | TyBool Tag
               | TyInt Tag
               | TyRef Type Tag
               | TyArray Type Tag
-              deriving (Eq)
 
 isBool (TyBool _) = True
 isBool _ = False
