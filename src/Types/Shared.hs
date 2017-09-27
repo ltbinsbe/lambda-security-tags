@@ -36,3 +36,7 @@ flatten t = fromList <$> flatten' t
     flatten' Top             = return []
     flatten' Bot             = Nothing
     flatten' (TgAnn ann)     = return [ann]
+
+-- | Version of `flatten` that replaces `Bot` with the given set
+flattenWithDef :: Set Ann -> Tag -> Set Ann
+flattenWithDef def = maybe def id . flatten 
