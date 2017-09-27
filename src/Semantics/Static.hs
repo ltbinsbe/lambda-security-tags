@@ -10,6 +10,21 @@ import Data.List (nub)
 
 -- `a1` -> `a2` means `a2` inherits from `a1` (i.e. `a2` is more specific)
 type AnnHier  = M.Map Ann [Ann] 
+{-
+typecheck :: Program -> Type -> Bool
+typecheck (Program ds term) ty = apply_rules hier term ty
+  where hier :: AnnHier
+        hier = foldr op M.empty ds
+         where op (SecAnn a) = M.insertWith (++) a []
+               op (SecAnnExt a2 a1) = M.insertWith (++) a1 [a2]
+
+apply_rules :: AnnHier -> Term -> Type -> Bool
+apply_rules hier term ty = 
+  as_coerce hier term ty
+
+as_coerce hier term ty = apply_rules (TAs (repLabel term (i2 + 1)) i2)
+  where i2 = labelOf term
+-}
 type TypeOp a = Tag -> Tag -> a -- answers `a1` inherits from `a2`?
 
 -- | Generates `<:` based on a hierarchy obtained from annotation declarations

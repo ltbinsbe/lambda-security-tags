@@ -40,3 +40,11 @@ flatten t = fromList <$> flatten' t
 -- | Version of `flatten` that replaces `Bot` with the given set
 flattenWithDef :: Set Ann -> Tag -> Set Ann
 flattenWithDef def = maybe def id . flatten 
+
+tagOf :: Type -> Tag
+tagOf ty = case ty of
+  TyArrow _ _ tag -> tag
+  TyBool tag      -> tag
+  TyInt tag       -> tag
+  TyRef _ tag     -> tag
+  TyArray _ tag   -> tag
