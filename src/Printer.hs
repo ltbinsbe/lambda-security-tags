@@ -6,6 +6,8 @@ import Types.Plain
 
 import Text.PrettyPrint.HughesPJ
 
+import qualified Data.Set as S
+
 instance Show Program where
   show = render . ppProgram
 
@@ -30,13 +32,19 @@ ppTerm t = case t of
                            <+> ppTerm p <+> text "in" <+> ppTerm q
   TAs term tag    -> parens (ppTerm term <+> text "as" <+> ppTag tag)
   TDrop term tag  -> parens (ppTerm term <+> text "drop" <+> ppTag tag)
-  TLam v ty t     -> parens (text "\\" <> text v <+> text ":" 
+  TLam v ty t tag -> parens (text "\\" <> text v <+> text ":" 
                             <+> ppType ty <+> text "." <+> ppTerm t)
-  TBool True      -> text "true"
-  TBool False     -> text "false"
-  TInt q          -> text (show q)
-  TRef r          -> text "<REF>"
-  TArray ts       -> text "<ARRAY>"
+                            <> ppFlattened tag
+  TBool True tag  -> text "true" <> ppFlattened tag
+  TBool False tag -> text "false" <> ppFlattened tag
+  TInt q tag      -> text (show q) <> ppFlattened tag
+  TRef r tag      -> text "<REF>" <> ppFlattened tag
+  TArray ts tag   -> text "<ARRAY>" <> ppFlattened tag
+
+ppFlattened :: Tag -> Doc
+ppFlattened tag | null flat = empty
+                | otherwise = angles (csd (map text flat)) 
+  where flat = maybe (error "ppFlattened Bottom") S.toList $ flatten tag
  
 ppType :: Type -> Doc
 ppType ty = case ty of
@@ -60,4 +68,6 @@ ppTag' ta = case ta of
 angles :: Doc -> Doc
 angles d = text "<" <> d <> text ">"
 
+csd :: [Doc] -> Doc
+csd = hcat . punctuate comma
 

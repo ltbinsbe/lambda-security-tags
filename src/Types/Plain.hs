@@ -13,9 +13,9 @@ data Term     -- computations
               | TAs Term Tag
               | TDrop Term Tag
               -- values / terminals
-              | TLam {- \ -} Var {- : -} Type {- . -} Term
-              | TBool Bool
-              | TInt Int
-              | TRef Ref {- no concrete syntax -}
-              | TArray [Term] {- array shorthand as concrete syntax? -}
+              | TLam {- \ -} Var {- : -} Type {- . -} Term Tag
+              | TBool Bool Tag
+              | TInt Int Tag
+              | TRef Ref Tag {- no concrete syntax -}
+              | TArray [Term] Tag {- array shorthand as concrete syntax? -}
 

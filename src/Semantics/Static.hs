@@ -51,14 +51,20 @@ rule_var hier env term = case term of
 
 rule_bool :: Rule
 rule_bool hier env term = case term of
-  TBool _ -> [TyBool Top]
-  _       -> []
+  TBool _ tag -> [TyBool tag]
+  _           -> []
+
+rule_int :: Rule
+rule_int hier env term = case term of
+  TInt _ tag  -> [TyInt tag]
+  _           -> []
+
 
 rule_abs :: Rule
 rule_abs hier env term = case term of 
-  TLam x ty t -> do
+  TLam x ty t tag -> do
     ty2 <- apply_rules hier (M.insert x ty env) t
-    return $ TyArrow ty ty2 Top
+    return $ TyArrow ty ty2 tag 
   _           -> []
 
 rule_app :: Rule
