@@ -9,6 +9,7 @@ import Types.Plain
 import qualified Types.Labelled as L
 
 import Semantics.Labelling
+import Semantics.Static
 
 label :: Program -> L.Program
 label (Program ds t) = process (Program ds t)
@@ -87,5 +88,6 @@ integer = TyInt
 ex1 :: Program 
 ex1 = Program [
     ann_decl "CSRV"
+  , ann_decl "CryptKey"
   ] $ 
-  "x" <:> boolean (ann "CSRV") <.> var "x"
+  "x" <:> boolean (ann "CSRV") <.> var "x" `as` (ann "CryptKey")

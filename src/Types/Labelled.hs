@@ -3,6 +3,8 @@ module Types.Labelled where
 
 import Types.Shared
 
+import qualified Data.Set as S
+
 type Label    = Int    --labels
 
 data Program  = Program [Decl] Term
@@ -36,6 +38,17 @@ labelOf t = case t of
   TInt _ l -> l
   TRef _ l -> l
   TArray _ l -> l
+
+labelsOf :: Term -> S.Set Label
+labelsOf t = (S.singleton (labelOf t) `S.union`) $ case t of 
+  TApp p q _ -> labelsOf p `S.union` labelsOf q
+  TITE g p q _ -> labelsOf p `S.union` labelsOf q
+  TLet _ l1 p q _ -> S.insert l1 $ labelsOf p `S.union` labelsOf q
+  TAs p _ _ -> labelsOf p
+  TDrop p _ _ -> labelsOf p
+  TLam _ l1 _ p _ -> S.insert l1 $ labelsOf p
+  TArray es l -> S.unions (map labelsOf es)
+  _ -> S.empty
 
 -- | If `t` is a term labelled with `l` then `repLabel t l'` is the (same) term
 -- labelled with `l'`. If `t` is not labelled then `repLabel t l'` equals `t`
