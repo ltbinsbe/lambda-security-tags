@@ -1,0 +1,6 @@
+
+SecAnn C
+SecAnn TB extends C
+SecAnn FB extends C
+if true<> then true<TB> else true<FB>
+

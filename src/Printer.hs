@@ -14,6 +14,9 @@ instance Show Program where
 instance Show Type where
   show = render . ppType
 
+instance Show Term where
+  show = render . ppTerm
+
 ppProgram :: Program -> Doc
 ppProgram (Program ds t) = vcat (map ppDecl ds) $$ ppTerm t
 

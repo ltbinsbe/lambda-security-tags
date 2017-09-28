@@ -4,6 +4,7 @@ module Main where
 import Parser (parser, lexerSettings) 
 import Printer
 import Semantics.Static (typings)
+import Semantics.Dynamic (eval)
 
 import GLL.Combinators (lexer)
 
@@ -31,3 +32,5 @@ go args f = do
         putStrLn (show pr)
         putStrLn "Types:"
         forM_ (typings pr) (putStrLn . show)
+        putStrLn "Evaluation result:"
+        putStrLn (show (eval pr))

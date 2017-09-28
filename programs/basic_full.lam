@@ -1,0 +1,6 @@
+
+SecAnn C
+SecAnn TB
+SecAnn FB
+
+(\x:Bool<C>.(\y:Bool<>. if x then (y as <TB>) else (y as <FB>))) (true as <C>) false<>
