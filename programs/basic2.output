@@ -1,0 +1,6 @@
+== Interpretation 1 ==
+SecAnn Par
+SecAnn Chd extends Par
+((\x : Bool<Par> . x) true)
+==
+Program does not type-check

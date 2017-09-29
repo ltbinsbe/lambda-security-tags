@@ -8,7 +8,7 @@ import Semantics.Dynamic (eval)
 
 import GLL.Combinators (lexer)
 
-import Control.Monad (forM_)
+import Control.Monad (forM_, when, unless)
 
 import System.Environment
 
@@ -28,9 +28,13 @@ go args f = do
     case mpr of 
       Left err  -> putStrLn ("error: " ++ err)
       Right pr  -> do
-        putStrLn "AST:"
         putStrLn (show pr)
-        putStrLn "Types:"
-        forM_ (typings pr) (putStrLn . show)
-        putStrLn "Evaluation result:"
-        putStrLn (show (eval pr))
+        putStrLn "=="
+        let types = typings pr
+        when (null types) (putStrLn "Program does not type-check")
+        unless (null types) $ do
+          putStrLn "Types:"
+          forM_ types (putStrLn . show)
+          putStrLn "Evaluation result:"
+          putStrLn (show (eval pr))
+

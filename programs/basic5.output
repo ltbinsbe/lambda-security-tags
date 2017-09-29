@@ -1,0 +1,10 @@
+== Interpretation 1 ==
+SecAnn C
+SecAnn TB extends C
+SecAnn FB extends C
+if true then true<TB> else true<FB>
+==
+Types:
+Bool<C>
+Evaluation result:
+true<TB>

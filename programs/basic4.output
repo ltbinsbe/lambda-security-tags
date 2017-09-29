@@ -1,0 +1,9 @@
+== Interpretation 1 ==
+SecAnn Par
+SecAnn Chd extends Par
+((\x : Bool<Par> . x) (true as <Chd>))
+==
+Types:
+Bool<Par>
+Evaluation result:
+true<Chd>

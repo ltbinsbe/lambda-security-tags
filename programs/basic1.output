@@ -1,0 +1,7 @@
+== Interpretation 1 ==
+((\x : Bool<> . x) true)
+==
+Types:
+Bool<>
+Evaluation result:
+true
