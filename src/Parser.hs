@@ -58,8 +58,8 @@ pTag = "tags" <:=> angles pTagContents
 pTagContents :: Parser Tag
 pTagContents = "contents-tags" 
   <::=  TgAnn <$$> pAnn
-  <||>  TgProd <$$> pTag <** keychar '*' <**>>> pTag -- left associative
   <||>  satisfy Top -- consumes no tokens
+  <||>  tg_prod <$$> pTag <** keychar '*' <**>>> pTag -- left associative
 
 pVar :: Parser Var
 pVar = "variables" <:=> id_lit

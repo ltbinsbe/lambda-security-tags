@@ -15,6 +15,12 @@ data Tag      = TgAnn Ann
               | Top
               | Bot
 
+-- smart constructor replacing `TgProd` that ignores occurrences of `Top`
+tg_prod :: Tag -> Tag -> Tag
+tg_prod Top t2 = t2
+tg_prod t1 Top = t1
+tg_prod t1 t2  = TgProd t1 t2
+
 data Type     = TyArrow Type Type Tag 
               | TyBool Tag
               | TyInt Tag
