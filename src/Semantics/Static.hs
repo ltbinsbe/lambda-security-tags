@@ -19,8 +19,8 @@ typings :: Program -> [Type]
 typings (Program ds t) = typesOf (gHierarchy ds) t
 
 isOfType :: AnnHier -> Term -> Type -> Bool
-isOfType hier term tyB = any compare (typesOf hier term)
-  where compare tyS = tyS `typeEq` tyB && gSubTagOp hier (tagOf tyS) (tagOf tyB)
+isOfType hier term ty2 = any compare (typesOf hier term)
+  where compare ty1 = ty1 `typeEq` ty2 && gSubTagOp hier (tagOf ty1) (tagOf ty2)
 
 typesOf :: AnnHier -> Term -> [Type]
 typesOf hier term = apply_rules hier M.empty term 
@@ -67,7 +67,7 @@ rule_app hier env term = case term of
     case ty_arr of  
       TyArrow ty1 ty2 s3  -> do ty3 <- apply_rules hier env t2
                                 guard (ty1 `typeEq` ty3)
-                                guard (gSubTagOp hier (tagOf ty1) (tagOf ty3))
+                                guard (gSubTagOp hier (tagOf ty3) (tagOf ty1))
                                 return ty2
       _                 -> []
   _           -> []
