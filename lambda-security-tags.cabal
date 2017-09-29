@@ -25,7 +25,7 @@ executable runlam
                         , Semantics.Static
                         , Semantics.Dynamic
   -- other-extensions:    
-  build-depends:        base >=4.9 && <4.10
+  build-depends:        base >=4.3
                       , containers
                       , pretty
                       , gll >= 0.4.0.3

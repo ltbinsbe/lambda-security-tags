@@ -53,7 +53,6 @@ rule_int hier env term = case term of
   TInt _ tag  -> [TyInt tag]
   _           -> []
 
-
 rule_abs :: Rule
 rule_abs hier env term = case term of 
   TLam x ty t tag -> do
