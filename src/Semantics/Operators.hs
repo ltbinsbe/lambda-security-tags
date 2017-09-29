@@ -4,6 +4,7 @@ module Semantics.Operators where
 import Types.Shared
 import Types.Plain
 
+import Data.List (nub)
 import qualified Data.Map as M
 import qualified Data.Set as S
 
@@ -54,10 +55,10 @@ gIntersectionOp hier p q = case (p,q) of
 --    it may be that `a0 = a1` or that `a0 = a2`
   (TgAnn a1, TgAnn a2)        -> search a1 a2
   (TgAnn a1, TgProd _ _)
-    | a1 `S.member` flatten q -> TgAnn a1
+    | any (isDescendant hier a1) (flatten q) -> TgAnn a1
     | otherwise               -> Top
   (TgProd _ _, TgAnn a2)
-    | a2 `S.member` flatten p -> TgAnn a2
+    | any (isDescendant hier a2) (flatten p) -> TgAnn a2
     | otherwise               -> Top
   (TgProd _ _, TgProd _ _)
     | S.null common           -> Top
@@ -75,6 +76,19 @@ gIntersectionOp hier p q = case (p,q) of
                            , isAncestor hier a0 a2 ]
             deepest = filter op mutual 
               where op a = all (\a' -> a' == a || not (isAncestor hier a a')) mutual
+    searchV a1s a2s 
+      | null deepest = Top
+      | otherwise    = foldr1 TgProd (map TgAnn (nub deepest))
+      where mutual = [ if p1 then a1 else a2   
+                     | a1 <- a1s
+                     , a2 <- a2s
+                     , let p1 = isAncestor hier a1 a2 
+                     , let p2 = isAncestor hier a2 a1
+                     , p1 || p2
+                     ]
+            deepest = filter op mutual 
+              where op a = all (\a' -> a' == a || not (isAncestor hier a a')) mutual
+
 
 gCutOp :: AnnHier -> TagOp Tag
 gCutOp hier p q = case (p,q) of
