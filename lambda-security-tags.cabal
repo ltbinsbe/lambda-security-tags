@@ -17,7 +17,13 @@ cabal-version:       >=1.10
 
 executable runlam 
   main-is:             Main.hs
-  -- other-modules:       
+  other-modules:          Types.Plain
+                        , Types.Shared
+                        , Printer
+                        , Parser 
+                        , Semantics.Operators
+                        , Semantics.Static
+                        , Semantics.Dynamic
   -- other-extensions:    
   build-depends:        base >=4.9 && <4.10
                       , containers

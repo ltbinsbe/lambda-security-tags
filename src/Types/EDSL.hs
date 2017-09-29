@@ -75,7 +75,6 @@ infix 5 <*>
 ann :: Ann -> Tag
 ann = TgAnn
 top = Top
-bot = Bot
 
 -- building types
 
