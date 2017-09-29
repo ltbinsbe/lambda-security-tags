@@ -1,8 +1,9 @@
 
-module Semantics.Dynamic where
+module Semantics.Dynamic (step, steps, eval) where
 
 import Types.Shared
 import Types.Plain
+import Semantics.Operators
 
 subs :: Var -> Term {- value -} -> Term -> Term
 subs x v t = case t of 
@@ -22,4 +23,46 @@ subs x v t = case t of
   TInt i tag          -> TInt i tag
   TRef r tag          -> TRef r tag
   TArray es tag       -> TArray (map (subs x v) es) tag
-    
+
+isVal :: Term -> Bool
+isVal t = case t of
+  TBool _ _     -> True
+  TInt _ _      -> True
+  TRef _ _      -> True
+  TArray _ _    -> True
+  TLam _ _ _ _  -> True
+  _             -> False
+
+eval :: Program -> Term
+eval (Program ds term) = steps (gHierarchy ds) term
+
+steps :: AnnHier -> Term -> Term {- value -}
+steps hier t  | isVal t   = t
+              | otherwise = steps hier (step hier t)
+
+step :: AnnHier -> Term -> Term
+step hier t = case t of
+  TVar x      -> error ("unbound variable: " ++ x)
+  TApp t1 t2 | isVal t1 && isVal t2 -> case t1 of 
+    TLam x ty t tag -> subs x t2 t
+    _               -> error ("not an abstraction in application")
+  --simplification: left-to-right evaluation
+  TApp t1 t2 | isVal t1 -> TApp t1 (premise t2)
+  TApp t1 t2            -> TApp (premise t1) t2
+  TITE t1 t2 t3 | isVal t1 -> case t1 of
+    TBool True s1   -> t2
+    TBool False s1  -> t3
+    _               -> error ("guard of if-then-else not a boolean")
+  TITE t1 t2 t3 -> TITE (premise t1) t2 t3
+  TLet x t1 t2 | isVal t1 -> subs x t1 t2 
+  TLet x t1 t2            -> TLet x (premise t1) t2
+  TAs t1 tag | isVal t1   -> valRepTag (TgProd (valTagOf t1) tag) t1 
+  TAs t1 tag              -> TAs (premise t1) tag
+  TDrop t1 tag | isVal t1 -> valRepTag (gCutOp hier (valTagOf t1) tag) t1
+  TDrop t1 tag            -> TDrop (premise t1) tag
+  TLam _ _ _ _            -> error "step on value"
+  TBool _ _               -> error "step on value"
+  TInt _ _                -> error "step on value"
+  TRef _ _                -> error "step on value"
+  TArray _ _              -> error "step on value"
+  where premise = step hier
