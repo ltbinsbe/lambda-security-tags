@@ -77,18 +77,15 @@ gIntersectionOp hier p q = case (p,q) of
             deepest = filter op mutual 
               where op a = all (\a' -> a' == a || not (isAncestor hier a a')) mutual
     searchV a1s a2s 
-      | null deepest = Top
-      | otherwise    = foldr1 TgProd (map TgAnn (nub deepest))
-      where mutual = [ if p1 then a1 else a2   
+      | null inter = Top
+      | otherwise    = foldr1 TgProd (map TgAnn (nub inter))
+      where inter  = [ if p1 then a1 else a2   
                      | a1 <- a1s
                      , a2 <- a2s
                      , let p1 = isAncestor hier a1 a2 
                      , let p2 = isAncestor hier a2 a1
                      , p1 || p2
                      ]
-            deepest = filter op mutual 
-              where op a = all (\a' -> a' == a || not (isAncestor hier a a')) mutual
-
 
 gCutOp :: AnnHier -> TagOp Tag
 gCutOp hier p q = case (p,q) of
