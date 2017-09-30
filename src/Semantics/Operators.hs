@@ -68,10 +68,8 @@ gIntersectionOp hier p q = case (p,q) of
   (TgProd _, TgAnn a2)
     | any (isDescendant hier a2) (flatten hier p) -> TgAnn a2
     | otherwise               -> Top
-  (TgProd _, TgProd _)
-    | S.null common           -> Top
-    | otherwise               -> TgProd $ S.toList common
-        where common = flatten hier p `S.intersection` flatten hier q
+  (TgProd _, TgProd _)        -> safe_product $  
+    searchV (S.toList $ flatten hier p) (S.toList $ flatten hier q) 
   -- inefficient but relatively easy to understand
   where
     all_anns = S.fromList (M.keys hier)
@@ -82,15 +80,12 @@ gIntersectionOp hier p q = case (p,q) of
       where mutual = [ a0  | a0 <- S.toList all_anns
                            , isAncestor hier a0 a1
                            , isAncestor hier a0 a2 ]
-    searchV a1s a2s 
-      | null inter = Top
-      | otherwise    = TgProd (nub inter)
-      where inter  = [ if p1 then a1 else a2   
+    searchV a1s a2s = deepest hier (nub inter)
+      where inter  = [ a
                      | a1 <- a1s
                      , a2 <- a2s
-                     , let p1 = isAncestor hier a1 a2 
-                     , let p2 = isAncestor hier a2 a1
-                     , p1 || p2
+                     , a  <- S.toList (all_anns)
+                     , isAncestor hier a a1 && isAncestor hier a a2
                      ]
 
 gCutOp :: AnnHier -> TagOp Tag

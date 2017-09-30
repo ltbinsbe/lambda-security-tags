@@ -24,7 +24,10 @@ annotationsOf Top         = []
 annotationsOf (TgProd as) = as
 
 tg_prod :: Tag -> Tag -> Tag
-tg_prod t1 t2 = case annotationsOf t1 ++ annotationsOf t2 of
+tg_prod t1 t2 = safe_product (annotationsOf t1 ++ annotationsOf t2)
+
+safe_product :: [Ann] -> Tag
+safe_product as = case as of
   []  -> Top
   [a] -> TgAnn a
   as  -> TgProd as

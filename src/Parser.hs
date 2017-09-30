@@ -59,7 +59,7 @@ pTagContents :: Parser Tag
 pTagContents = "contents-tags" 
   <::=  TgAnn <$$> pAnn
   <||>  satisfy Top -- consumes no tokens
-  <||>  TgProd <$$> manySepBy2 pAnn (keychar ',') 
+  <||>  TgProd <$$> manySepBy2 pAnn (keychar '*') 
 
 pVar :: Parser Var
 pVar = "variables" <:=> id_lit
