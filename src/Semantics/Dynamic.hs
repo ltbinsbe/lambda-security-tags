@@ -56,7 +56,7 @@ step hier t = case t of
   TITE t1 t2 t3 -> TITE (premise t1) t2 t3
   TLet x t1 t2 | isVal t1 -> subs x t1 t2 
   TLet x t1 t2            -> TLet x (premise t1) t2
-  TAs t1 tag | isVal t1   -> valRepTag (TgProd (valTagOf t1) tag) t1 
+  TAs t1 tag | isVal t1   -> valRepTag (tg_prod (valTagOf t1) tag) t1 
   TAs t1 tag              -> TAs (premise t1) tag
   TDrop t1 tag | isVal t1 -> valRepTag (gCutOp hier (valTagOf t1) tag) t1
   TDrop t1 tag            -> TDrop (premise t1) tag

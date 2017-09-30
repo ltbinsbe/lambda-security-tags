@@ -1,8 +1,6 @@
 
 module Types.Shared where
 
-import Data.Set (Set, singleton, empty, union, fromList)
-
 type Ann      = String  --annotations
 type Var      = String  --identifiers/variables
 type Ref      = String  --mutable references
@@ -11,20 +9,25 @@ data Decl     = SecAnn Ann
               | SecAnnExt Ann Ann
 
 data Tag      = TgAnn Ann
-              | TgProd Tag Tag
+              | TgProd [Ann]
               | Top
-
--- smart constructor replacing `TgProd` that ignores occurrences of `Top`
-tg_prod :: Tag -> Tag -> Tag
-tg_prod Top t2 = t2
-tg_prod t1 Top = t1
-tg_prod t1 t2  = TgProd t1 t2
 
 data Type     = TyArrow Type Type Tag 
               | TyBool Tag
               | TyInt Tag
               | TyRef Type Tag
               | TyArray Type Tag
+
+annotationsOf :: Tag -> [Ann]
+annotationsOf (TgAnn ann) = [ann]
+annotationsOf Top         = []
+annotationsOf (TgProd as) = as
+
+tg_prod :: Tag -> Tag -> Tag
+tg_prod t1 t2 = case annotationsOf t1 ++ annotationsOf t2 of
+  []  -> Top
+  [a] -> TgAnn a
+  as  -> TgProd as
 
 isBool (TyBool _) = True
 isBool _ = False
@@ -44,13 +47,6 @@ typeEq t1 t2 = case (t1,t2) of
   (TyRef _ _, _)                      -> False
   (_, TyRef _ _)                      -> False
   (TyArray p1 _, TyArray p2 _)        -> p1 `typeEq` p2
-
--- | Flattens a (product) tag to a set of annotations 
--- under the assumption that `t1 * Top` is `t1` for all `t1`
-flatten :: Tag -> Set Ann
-flatten (TgProd t1 t2)  = flatten t1 `union` flatten t2
-flatten Top             = empty 
-flatten (TgAnn ann)     = singleton ann
 
 tagOf :: Type -> Tag
 tagOf ty = case ty of

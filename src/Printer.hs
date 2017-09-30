@@ -47,7 +47,7 @@ ppTerm t = case t of
 ppFlattened :: Tag -> Doc
 ppFlattened tag | null flat = empty
                 | otherwise = angles (csd (map text flat)) 
-  where flat = S.toList $ flatten tag
+  where flat = annotationsOf tag
  
 ppType :: Type -> Doc
 ppType ty = case ty of
@@ -63,9 +63,9 @@ ppTag ta = angles $ ppTag' ta
 
 ppTag' :: Tag -> Doc
 ppTag' ta = case ta of
-        TgAnn ann   -> text ann
-        TgProd p q  -> ppTag' p <+> text "*" <+> ppTag' q
-        Top         -> empty 
+        TgAnn ann -> text ann
+        TgProd as -> csd (map text as) 
+        Top       -> empty 
 
 angles :: Doc -> Doc
 angles d = text "<" <> d <> text ">"

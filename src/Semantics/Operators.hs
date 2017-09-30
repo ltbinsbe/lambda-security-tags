@@ -4,7 +4,7 @@ module Semantics.Operators where
 import Types.Shared
 import Types.Plain
 
-import Data.List (nub)
+import Data.List (nub, elem)
 import qualified Data.Map as M
 import qualified Data.Set as S
 
@@ -24,9 +24,9 @@ gSubTagOp hier p q = case (p,q) of
   (Top, _)                  -> False
   -- Find in the hierarchy whether `a2` is `a1` or any of the descendents of `a1`
   (TgAnn a1, TgAnn a2)      -> isDescendant hier a1 a2
-  (TgAnn _, TgProd _ _)     -> flatten p `extends` flatten q
-  (TgProd _ _, TgProd _ _)  -> flatten p `extends` flatten q
-  (TgProd _ _, TgAnn _)     -> flatten p `extends` flatten q
+  (TgAnn _, TgProd _)     -> flatten hier p `extends` flatten hier q
+  (TgProd _, TgProd _)  -> flatten hier p `extends` flatten hier q
+  (TgProd _, TgAnn _)     -> flatten hier p `extends` flatten hier q
   where
     extends s1 s2 = all op (S.toList s2) 
       where op s = s `S.member` s1 -- every element in s2 is in s1
@@ -44,6 +44,14 @@ isAncestor hier a1 a2 = search a2 [a1]
                   | tgt == src = True
                   | otherwise  = search tgt (maybe [] id $ M.lookup src hier)
 
+parentOf :: AnnHier -> Ann -> Tag 
+parentOf hier chd = 
+  case [ par | (par, chds) <- M.assocs hier
+             , chd `elem` chds ] of
+    []  -> Top
+    [a] -> TgAnn a
+    _   -> error "parentOf (multiple inheritances)"
+
 -- | Generates intersection
 --     based on a hierarchy obtained from annotation declarations
 gIntersectionOp :: AnnHier -> TagOp Tag
@@ -54,31 +62,29 @@ gIntersectionOp hier p q = case (p,q) of
 --    such that `a1` and `a2` are both descendents of `a1`
 --    it may be that `a0 = a1` or that `a0 = a2`
   (TgAnn a1, TgAnn a2)        -> search a1 a2
-  (TgAnn a1, TgProd _ _)
-    | any (isDescendant hier a1) (flatten q) -> TgAnn a1
+  (TgAnn a1, TgProd _)
+    | any (isDescendant hier a1) (flatten hier q) -> TgAnn a1
     | otherwise               -> Top
-  (TgProd _ _, TgAnn a2)
-    | any (isDescendant hier a2) (flatten p) -> TgAnn a2
+  (TgProd _, TgAnn a2)
+    | any (isDescendant hier a2) (flatten hier p) -> TgAnn a2
     | otherwise               -> Top
-  (TgProd _ _, TgProd _ _)
+  (TgProd _, TgProd _)
     | S.null common           -> Top
-    | otherwise               -> foldr1 TgProd (map TgAnn $ S.toList common)
-        where common = flatten p `S.intersection` flatten q
+    | otherwise               -> TgProd $ S.toList common
+        where common = flatten hier p `S.intersection` flatten hier q
   -- inefficient but relatively easy to understand
   where
     all_anns = S.fromList (M.keys hier)
-    search a1 a2 = case deepest of 
+    search a1 a2 = case deepest hier mutual of 
       []    -> Top -- if there is no deepest common ancestor
       [a0]  -> TgAnn a0
       _     -> error "multiple deepest common ancestors for simple annotation? :S"
       where mutual = [ a0  | a0 <- S.toList all_anns
                            , isAncestor hier a0 a1
                            , isAncestor hier a0 a2 ]
-            deepest = filter op mutual 
-              where op a = all (\a' -> a' == a || not (isAncestor hier a a')) mutual
     searchV a1s a2s 
       | null inter = Top
-      | otherwise    = foldr1 TgProd (map TgAnn (nub inter))
+      | otherwise    = TgProd (nub inter)
       where inter  = [ if p1 then a1 else a2   
                      | a1 <- a1s
                      , a2 <- a2s
@@ -89,23 +95,38 @@ gIntersectionOp hier p q = case (p,q) of
 
 gCutOp :: AnnHier -> TagOp Tag
 gCutOp hier p q = case (p,q) of
-  (_, Top)                      -> p    -- cuts of nothing
+  (_, Top)                      -> Top  -- cuts of everything 
   (Top, _)                      -> Top  -- nothing to cut off
   (TgAnn a1, TgAnn a2) 
-    | a1 == a2                  -> Top -- cuts of everything
-    | otherwise                 -> p   -- cuts of nothing
-  (TgAnn a1, TgProd _ _) 
-    | a1 `S.member` flatten q   -> Top -- ...
+    | gSubTagOp hier p q        -> parentOf hier a2
+    | otherwise                 -> p    -- cuts of nothing
+  (TgAnn a1, TgProd _) 
+    | a1 `S.member` flatten hier q   -> Top -- ...
     | otherwise                 -> p
-  (TgProd _ _, TgAnn a2)
+  (TgProd _, TgAnn a2)
     | S.null cutoff             -> Top
-    | otherwise                 -> foldr1 TgProd (map TgAnn $ S.toList cutoff)
-   where flat_p = flatten p
+    | otherwise                 -> TgProd $ S.toList cutoff
+   where flat_p = flatten hier p
          cutoff = flat_p `S.difference` (S.singleton a2)
-  (TgProd _ _, TgProd _ _)
+  (TgProd _, TgProd _)
     | S.null cutoff             -> Top
-    | otherwise                 -> foldr1 TgProd (map TgAnn $ S.toList cutoff)
-    where cutoff = flatten p `S.difference` flatten q
+    | otherwise                 -> TgProd $ S.toList cutoff
+    where cutoff = flatten hier p `S.difference` flatten hier q
   where
     all_anns = S.fromList (M.keys hier)
+
+-- | Flattens a (product) tag to a set of annotations 
+-- under the assumption that `t1 * Top` is `t1` for all `t1`
+-- the set is such that if `a1 <: a2` then `a2` is in and not `a1`
+--                                      or neither is in
+flatten :: AnnHier -> Tag -> S.Set Ann
+flatten hier (TgProd as)  = S.fromList $ as 
+flatten hier Top          = S.empty 
+flatten hier (TgAnn ann)  = S.singleton ann
+
+-- | Filters a list of annotations by removing all parents of annotations
+-- present in the list (only orphans and children are preserved).
+deepest :: AnnHier -> [Ann] -> [Ann]
+deepest hier as = filter op as
+  where op a = all (\a' -> a' == a || not (isAncestor hier a a')) as
 
