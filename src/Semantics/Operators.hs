@@ -95,18 +95,12 @@ gCutOp hier p q = case (p,q) of
   (TgAnn a1, TgAnn a2) 
     | gSubTagOp hier p q        -> parentOf hier a2
     | otherwise                 -> p    -- cuts of nothing
-  (TgAnn a1, TgProd _) 
-    | a1 `S.member` flatten hier q   -> Top -- ...
-    | otherwise                 -> p
-  (TgProd _, TgAnn a2)
-    | S.null cutoff             -> Top
-    | otherwise                 -> TgProd $ S.toList cutoff
-   where flat_p = flatten hier p
-         cutoff = flat_p `S.difference` (S.singleton a2)
-  (TgProd _, TgProd _)
-    | S.null cutoff             -> Top
-    | otherwise                 -> TgProd $ S.toList cutoff
-    where cutoff = flatten hier p `S.difference` flatten hier q
+  (TgAnn a, TgProd _)           -> foldr op Top (flatten hier q)
+    where op bi = tg_prod (gCutOp hier (TgAnn a) (TgAnn bi))
+  (TgProd _, TgAnn b)           -> foldr op Top (flatten hier p)
+    where op ai = tg_prod (gCutOp hier (TgAnn ai) (TgAnn b))
+  (TgProd _, TgProd _)          -> foldr op Top (flatten hier p)
+    where op ai = tg_prod (gCutOp hier (TgAnn ai) q)
   where
     all_anns = S.fromList (M.keys hier)
 
