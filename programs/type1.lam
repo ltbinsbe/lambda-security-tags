@@ -1,0 +1,4 @@
+
+SecAnn Par
+SecAnn Chd extends Par
+((\x:Bool<Par> . x) (true as <Chd>)) : Bool<Par>

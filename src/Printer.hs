@@ -18,7 +18,7 @@ instance Show Term where
   show = render . ppTerm
 
 ppProgram :: Program -> Doc
-ppProgram (Program ds t) = vcat (map ppDecl ds) $$ ppTerm t
+ppProgram (Program ds t mty) = vcat (map ppDecl ds) $$ ppTerm t $$ ppMaybe mty ppType
 
 ppDecl :: Decl -> Doc
 ppDecl d = case d of
@@ -73,3 +73,6 @@ angles d = text "<" <> d <> text ">"
 csd :: [Doc] -> Doc
 csd = hcat . punctuate comma
 
+ppMaybe :: Maybe a -> (a -> Doc) -> Doc
+ppMaybe Nothing f   = empty
+ppMaybe (Just a) f  = f a

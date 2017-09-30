@@ -3,7 +3,7 @@ module Types.Plain where
 
 import Types.Shared
 
-data Program  = Program [Decl] Term
+data Program  = Program [Decl] Term (Maybe Type)
 
 data Term     -- computations
               = TVar Var

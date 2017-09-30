@@ -3,7 +3,7 @@ module Main where
 
 import Parser (parser, lexerSettings) 
 import Printer
-import Semantics.Static (typings)
+import Semantics.Static (typecheck)
 import Semantics.Dynamic (eval)
 
 import GLL.Combinators (lexer)
@@ -30,11 +30,14 @@ go args f = do
       Right pr  -> do
         putStrLn (show pr)
         putStrLn "=="
-        let types = typings pr
-        when (null types) (putStrLn "Program does not type-check")
-        unless (null types) $ do
-          putStrLn "Types:"
-          forM_ types (putStrLn . show)
-          putStrLn "Evaluation result:"
-          putStrLn (show (eval pr))
+        let types = typecheck pr
+        case types of
+          Left False  -> putStrLn "Program does not type-check"
+          Right []    -> putStrLn "Program does not type-check"
+          Left True   -> putStrLn "Program type-checks"
+          Right types -> do
+            putStrLn "Types:"
+            forM_ types (putStrLn . show)
+            putStrLn "Evaluation result:"
+            putStrLn (show (eval pr))
 

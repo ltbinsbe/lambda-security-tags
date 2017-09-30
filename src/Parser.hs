@@ -20,7 +20,8 @@ parser = parseWithParseOptions [] [maximumErrors 1, throwErrors]
 
 pProgram :: Parser Program
 pProgram = "programs" 
-  <:=> Program <$$> multiple pDecl <**> pTerm
+  <:=> Program <$$> multiple pDecl <**> pTerm <**>
+    optional (keychar ':' **> pType) -- typing the check by static analyser
 
 pDecl :: Parser Decl
 pDecl = "declarations"

@@ -12,11 +12,13 @@ import Data.List (nub)
 
 type Env      = M.Map Var Type
 
-typecheck :: Program -> Type -> Bool
-typecheck (Program ds t) = isOfType (gHierarchy ds) t
-  
+typecheck :: Program -> Either Bool [Type]
+typecheck pr@(Program ds t mty) = case mty of 
+  Nothing -> Right $ typings pr
+  Just ty -> Left $ isOfType (gHierarchy ds) t ty
+   
 typings :: Program -> [Type]
-typings (Program ds t) = typesOf (gHierarchy ds) t
+typings (Program ds t _) = typesOf (gHierarchy ds) t
 
 isOfType :: AnnHier -> Term -> Type -> Bool
 isOfType hier term ty2 = any compare (typesOf hier term)

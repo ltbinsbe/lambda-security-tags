@@ -34,7 +34,7 @@ isVal t = case t of
   _             -> False
 
 eval :: Program -> Term
-eval (Program ds term) = steps (gHierarchy ds) term
+eval (Program ds term _) = steps (gHierarchy ds) term
 
 steps :: AnnHier -> Term -> Term {- value -}
 steps hier t  | isVal t   = t

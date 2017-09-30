@@ -1,0 +1,8 @@
+== Interpretation 1 ==
+SecAnn C
+SecAnn B extends C
+SecAnn A extends B
+((\x : Bool<B> . x) (true as <A>))
+Bool<B>
+==
+Program type-checks
