@@ -1,0 +1,8 @@
+
+SecAnn C
+SecAnn TB extends C
+SecAnn FB extends C
+SecAnn B extends C
+SecAnn A extends B
+
+(\x:Bool<C>.(\y:Bool<>. if x then (y as <TB*A>) else (y as <FB*B>))) (true as <C>) false<>
