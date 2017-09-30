@@ -40,19 +40,20 @@ steps :: AnnHier -> Term -> Term {- value -}
 steps hier t  | isVal t   = t
               | otherwise = steps hier (step hier t)
 
+-- TODO, refactor such that rules have separate functions
 step :: AnnHier -> Term -> Term
 step hier t = case t of
-  TVar x      -> error ("unbound variable: " ++ x)
+  TVar x -> error ("unbound variable: " ++ x)
   TApp t1 t2 | isVal t1 && isVal t2 -> case t1 of 
     TLam x ty t tag -> subs x t2 t
     _               -> error ("not an abstraction in application")
   --simplification: left-to-right evaluation
   TApp t1 t2 | isVal t1 -> TApp t1 (premise t2)
   TApp t1 t2            -> TApp (premise t1) t2
-  TITE t1 t2 t3 | isVal t1 -> case t1 of
-    TBool True s1   -> t2
-    TBool False s1  -> t3
-    _               -> error ("guard of if-then-else not a boolean")
+  TITE t1 t2 t3 | isVal t1-> case t1 of
+    TBool True s1         -> t2
+    TBool False s1        -> t3
+    _                     -> error ("guard of if-then-else not a boolean")
   TITE t1 t2 t3 -> TITE (premise t1) t2 t3
   TLet x t1 t2 | isVal t1 -> subs x t1 t2 
   TLet x t1 t2            -> TLet x (premise t1) t2

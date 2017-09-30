@@ -29,6 +29,8 @@ typesOf hier term = apply_rules hier M.empty term
 
 type Rule = AnnHier -> Env -> Term -> [Type]
 
+-- TODO, refactor to do only 1 pattern match per application
+-- but retain separation of rules across functions
 apply_rules :: Rule 
 apply_rules hier env term = 
       rule_var hier env term 
