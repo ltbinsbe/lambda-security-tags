@@ -3,16 +3,8 @@ module Types.EDSL where
 
 import Prelude hiding ((<*>), (<$>))
 
-import Printer
 import Types.Shared
 import Types.Plain
-import qualified Types.Labelled as L
-
-import Semantics.Labelling
-import Semantics.Static
-
-label :: Program -> L.Program
-label (Program ds t) = process (Program ds t)
 
 ann_decl :: Ann -> Decl
 ann_decl = SecAnn
@@ -29,7 +21,7 @@ v <:> ty = (v,ty)
 
 infix 4 <.>
 (<.>) :: (Var, Type) -> Term -> Term
-(v,ty) <.> t = TLam v ty t
+(v,ty) <.> t = TLam v ty t Top
 
 infix 3 <$>
 (<$>) :: Term -> Term -> Term
@@ -58,19 +50,15 @@ if_then_else = TITE
 -- building literals
 
 true :: Term
-true = TBool True
+true = TBool True Top
 
 false :: Term
-false = TBool False
+false = TBool False Top
 
 q :: Int -> Term
-q = TInt
+q = flip TInt Top
 
 -- building tags
-
-infix 5 <*> 
-(<*>) :: Tag -> Tag -> Tag
-(<*>) = TgProd
 
 ann :: Ann -> Tag
 ann = TgAnn
@@ -84,9 +72,14 @@ boolean = TyBool
 integer :: Tag -> Type
 integer = TyInt
 
+infixr 5 --> --type arrow
+(-->) :: Type -> Type -> Type
+p --> q = TyArrow p q Top
+
 ex1 :: Program 
 ex1 = Program [
     ann_decl "CSRV"
   , ann_decl "CryptKey"
-  ] $ 
-  "x" <:> boolean (ann "CSRV") <.> var "x" `as` (ann "CryptKey")
+  ]  
+  ("x" <:> boolean (ann "CSRV") <.> var "x" `as` (ann "CryptKey" ))
+  Nothing

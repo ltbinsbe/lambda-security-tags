@@ -2,7 +2,6 @@
 module Semantics.Operators where
 
 import Types.Shared
-import Types.Plain
 
 import Data.List (nub, elem)
 import qualified Data.Map as M

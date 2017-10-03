@@ -2,13 +2,13 @@
 module Main where
 
 import Parser (parser, lexerSettings) 
-import Printer
+import Printer()
 import Semantics.Static (typecheck)
 import Semantics.Dynamic (eval)
 
 import GLL.Combinators (lexer)
 
-import Control.Monad (forM_, when, unless)
+import Control.Monad (forM_,)
 
 import System.Environment
 

@@ -18,6 +18,9 @@ data Term     -- computations
               | TInt Int Tag
               | TRef Ref Tag {- no concrete syntax -}
               | TArray [Term] Tag {- array shorthand as concrete syntax? -}
+              -- auxiliary syntax for builtins (computations not values)
+              | TPlus Term Term 
+              | TOr Term Term 
 
 valTagOf :: Term {- value -} -> Tag
 valTagOf t = case t of 

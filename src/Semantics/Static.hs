@@ -4,11 +4,10 @@ module Semantics.Static where
 import Types.Shared
 import Types.Plain
 import Semantics.Operators
+import Semantics.Builtins
 
 import Control.Monad (guard)
 import qualified Data.Map as M
-import qualified Data.Set as S
-import Data.List (nub)
 
 type Env      = M.Map Var Type
 
@@ -25,7 +24,11 @@ isOfType hier term ty2 = any compare (typesOf hier term)
   where compare ty1 = ty1 `typeEq` ty2 && gSubTagOp hier (tagOf ty1) (tagOf ty2)
 
 typesOf :: AnnHier -> Term -> [Type]
-typesOf hier term = apply_rules hier M.empty term 
+typesOf hier term = apply_rules hier default_env term 
+  where default_env = M.fromList [
+            ("plus", plus_type)
+          , ("or", or_type)
+          ]
 
 type Rule = AnnHier -> Env -> Term -> [Type]
 
@@ -35,6 +38,7 @@ apply_rules :: Rule
 apply_rules hier env term = 
       rule_var hier env term 
   ++  rule_bool hier env term
+  ++  rule_int hier env term
   ++  rule_abs hier env term
   ++  rule_app hier env term
   ++  rule_let hier env term

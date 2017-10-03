@@ -8,7 +8,8 @@ import GLL.Combinators
 
 lexerSettings = emptyLanguage {
     keywords =  ["this", "let", "in", "if", "then", "else", "as", "drop"
-                ,"SecAnn", "extends", "true", "false", "Bool", "Int"]
+                ,"SecAnn", "extends", "true", "false", "Bool", "Int", "->"
+                ]
   , keychars = ['=', '\\', '.', '(', ')', '!', '*', '<', '>', ':']
   }
 
@@ -50,7 +51,7 @@ pType :: Parser Type
 pType = "types"
   <:=> TyBool <$$ keyword "Bool" <**> optionalWithDef pTag Top
   <||> TyInt  <$$ keyword "Int" <**> optionalWithDef pTag Top
-  <||> parens (TyArrow <$$> pType <** keyword "->" <**>>> pType) --left associative
+  <||> parens (TyArrow <$$> pType <** keyword "->" <**>>> pType) --right associative
           <**> pTag
 
 pTag :: Parser Tag

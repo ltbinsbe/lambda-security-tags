@@ -6,8 +6,6 @@ import Types.Plain
 
 import Text.PrettyPrint.HughesPJ
 
-import qualified Data.Set as S
-
 instance Show Program where
   show = render . ppProgram
 
@@ -18,7 +16,8 @@ instance Show Term where
   show = render . ppTerm
 
 ppProgram :: Program -> Doc
-ppProgram (Program ds t mty) = vcat (map ppDecl ds) $$ ppTerm t $$ ppMaybe mty ppType
+ppProgram (Program ds t mty) = vcat (map ppDecl ds) $$ ppTerm t <>
+  ppMaybe mty (\x -> text " :" <+> ppType x)
 
 ppDecl :: Decl -> Doc
 ppDecl d = case d of
@@ -43,6 +42,8 @@ ppTerm t = case t of
   TInt q tag      -> text (show q) <> ppFlattened tag
   TRef r tag      -> text "<REF>" <> ppFlattened tag
   TArray ts tag   -> text "<ARRAY>" <> ppFlattened tag
+  TPlus t1 t2     -> ppTerm t1 <+> text "+" <+> ppTerm t2
+  TOr t1 t2       -> ppTerm t1 <+> text "|" <+> ppTerm t2
 
 ppFlattened :: Tag -> Doc
 ppFlattened tag | null flat = empty
@@ -51,7 +52,7 @@ ppFlattened tag | null flat = empty
  
 ppType :: Type -> Doc
 ppType ty = case ty of
-  TyArrow p q t   -> ppType p <+> text "->" <+> ppType q <> ppTag t
+  TyArrow p q t   -> parens (ppType p <+> text "->" <+> ppType q) <> ppTag t
   TyBool t        -> text "Bool" <> ppTag t
   TyInt t         -> text "Int" <> ppTag t
   TyRef ty tag    -> parens (text "Ref" <+> ppType ty) <> ppTag tag

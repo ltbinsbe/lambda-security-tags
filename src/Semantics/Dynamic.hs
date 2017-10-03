@@ -4,6 +4,7 @@ module Semantics.Dynamic (step, steps, eval) where
 import Types.Shared
 import Types.Plain
 import Semantics.Operators
+import Semantics.Builtins
 
 subs :: Var -> Term {- value -} -> Term -> Term
 subs x v t = case t of 
@@ -23,6 +24,8 @@ subs x v t = case t of
   TInt i tag          -> TInt i tag
   TRef r tag          -> TRef r tag
   TArray es tag       -> TArray (map (subs x v) es) tag
+  TPlus t1 t2         -> TPlus (subs x v t1) (subs x v t2)
+  TOr t1 t2           -> TOr (subs x v t1) (subs x v t2)
 
 isVal :: Term -> Bool
 isVal t = case t of
@@ -42,7 +45,9 @@ steps hier t  | isVal t   = t
 
 -- TODO, refactor such that rules have separate functions
 step :: AnnHier -> Term -> Term
-step hier t = case t of
+step hier t = case t of 
+  TVar "plus" -> plus_term
+  TVar "or"   -> or_term 
   TVar x -> error ("unbound variable: " ++ x)
   TApp t1 t2 | isVal t1 && isVal t2 -> case t1 of 
     TLam x ty t tag -> subs x t2 t
@@ -66,4 +71,12 @@ step hier t = case t of
   TInt _ _                -> error "step on value"
   TRef _ _                -> error "step on value"
   TArray _ _              -> error "step on value"
-  where premise = step hier
+  TPlus t1 t2             -> case (t1, t2) of 
+        (TInt x Top, TInt y Top) -> TInt (x + y) Top
+        _                        -> error ("builtin: plus")
+  TOr t1 t2               -> case (t1, t2) of 
+        (TBool x Top, TBool y Top)  -> TBool (x || y) Top
+        _                           -> error ("builtin: or")
+  where
+    premise = step hier
+
