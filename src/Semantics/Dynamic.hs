@@ -72,10 +72,10 @@ step hier t = case t of
   TRef _ _                -> error "step on value"
   TArray _ _              -> error "step on value"
   TPlus t1 t2             -> case (t1, t2) of 
-        (TInt x Top, TInt y Top) -> TInt (x + y) Top
+        (TInt x _, TInt y _) -> TInt (x + y) Top
         _                        -> error ("builtin: plus")
   TOr t1 t2               -> case (t1, t2) of 
-        (TBool x Top, TBool y Top)  -> TBool (x || y) Top
+        (TBool x _, TBool y _)  -> TBool (x || y) Top
         _                           -> error ("builtin: or")
   where
     premise = step hier
