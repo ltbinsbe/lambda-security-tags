@@ -45,8 +45,7 @@ ppTerm t = case t of
   TArray ts tag   -> text "<ARRAY>" <> ppFlattened tag
 
 ppFlattened :: Tag -> Doc
-ppFlattened tag | null flat = empty
-                | otherwise = angles (csd (map text flat)) 
+ppFlattened tag = angles (csd (map text flat)) 
   where flat = annotationsOf tag
  
 ppType :: Type -> Doc
