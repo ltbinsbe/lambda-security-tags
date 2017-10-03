@@ -46,8 +46,7 @@ ppTerm t = case t of
   TOr t1 t2       -> ppTerm t1 <+> text "|" <+> ppTerm t2
 
 ppFlattened :: Tag -> Doc
-ppFlattened tag | null flat = empty
-                | otherwise = angles (csd (map text flat)) 
+ppFlattened tag = angles (csd (map text flat)) 
   where flat = annotationsOf tag
  
 ppType :: Type -> Doc

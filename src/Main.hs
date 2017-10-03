@@ -38,6 +38,6 @@ go args f = do
           Right types -> do
             putStrLn "Types:"
             forM_ types (putStrLn . show)
-            putStrLn "Evaluation result:"
-            putStrLn (show (eval pr))
+        putStrLn "Evaluation result:"
+        putStrLn (show (eval pr))
 
