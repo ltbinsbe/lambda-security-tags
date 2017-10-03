@@ -1,0 +1,7 @@
+== Interpretation 1 ==
+SecAnn A
+((\x : Bool<A> . x) if true then (true as <A>) else true)
+==
+Program does not type-check
+Evaluation result:
+true<A>
