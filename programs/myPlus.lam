@@ -1,0 +1,12 @@
+SecAnn NonSticky
+SecAnn A
+SecAnn B
+SecAnn C extends NonSticky
+
+let myPlus = 
+	(\x:Int<>.
+		(\y:Int<>. 
+			((copy x (copy y (plus x y)))) drop <NonSticky>
+		)
+	)
+ in myPlus (1 as <A> as <C>) (2 as <B>)

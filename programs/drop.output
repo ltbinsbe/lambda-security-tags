@@ -1,0 +1,9 @@
+== Interpretation 1 ==
+SecAnn A
+SecAnn B
+(true<A,B> drop <A>)
+==
+Types:
+Bool<B>
+Evaluation result:
+true<B>

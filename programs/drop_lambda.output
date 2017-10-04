@@ -1,0 +1,8 @@
+== Interpretation 1 ==
+SecAnn A
+((\x : Bool<A> . (x drop <A>))<> true<A>)
+==
+Types:
+Bool<>
+Evaluation result:
+true<>

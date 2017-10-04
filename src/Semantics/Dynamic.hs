@@ -16,7 +16,7 @@ subs x v t = case t of
                           True  -> t2 -- if let binds `x` then `x` is not free in `t2`
                           False -> subs x v t2
   TAs t1 tag          -> TAs (subs x v t1) tag
-  TDrop t1 tag        -> TAs (subs x v t1) tag
+  TDrop t1 tag        -> TDrop (subs x v t1) tag
   TCopy t1 t2         -> TCopy (subs x v t1) (subs x v t2)
   TLam y ty t1 tag 
     | x == y          -> TLam y ty t1 tag -- `x` not free in body `t1`
