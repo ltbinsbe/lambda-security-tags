@@ -44,8 +44,8 @@ as = TAs
 drop :: Term -> Tag -> Term
 drop = TDrop
 
-copy :: Term -> Term -> Term
-copy = TCopy
+cpAnn :: Term -> Term -> Term
+cpAnn = TCpAnn
 
 if_then_else :: Term -> Term -> Term -> Term
 if_then_else = TITE

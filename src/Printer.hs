@@ -34,7 +34,7 @@ ppTerm t = case t of
                            <+> ppTerm p <+> text "in" <+> ppTerm q
   TAs term tag    -> parens (ppTerm term <+> text "as" <+> ppTag tag)
   TDrop term tag  -> parens (ppTerm term <+> text "drop" <+> ppTag tag)
-  TCopy p q       -> parens (text "copy" <+> ppTerm p <+> ppTerm q)
+  TCpAnn p q       -> parens (text "cpAnn" <+> ppTerm p <+> ppTerm q)
   TLam v ty t tag -> parens (text "\\" <> text v <+> text ":" 
                             <+> ppType ty <+> text "." <+> ppTerm t)
                             <> ppFlattened tag

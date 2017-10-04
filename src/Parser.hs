@@ -9,7 +9,7 @@ import GLL.Combinators
 lexerSettings = emptyLanguage {
     keywords =  ["this", "let", "in", "if", "then", "else", "as", "drop"
                 ,"SecAnn", "extends", "true", "false", "Bool", "Int", "->", 
-                "copy"
+                "cpAnn"
                 ]
   , keychars = ['=', '\\', '.', '(', ')', '!', '*', '<', '>', ':']
   }
@@ -40,7 +40,7 @@ pTerm = "terms"
                                         <** keyword "in" <**> pTerm
   <||> TAs  <$$> pTerm <** keyword "as" <**> pTag
   <||> TDrop <$$> pTerm <** keyword "drop" <**> pTag
-  <||> TCopy <$$keyword "copy" <**> pTerm <**>>> pTerm
+  <||> TCpAnn <$$keyword "cpAnn" <**> pTerm <**>>> pTerm
   <||> parens (TLam <$$ keychar '\\' <**> pVar <** keychar ':' <**> pType
                                               <** keychar '.' <**> pTerm)
                                        <**> optionalWithDef pTag Top

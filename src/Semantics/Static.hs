@@ -45,7 +45,7 @@ apply_rules hier env term =
   ++  rule_if hier env term
   ++  rule_as hier env term
   ++  rule_drop hier env term 
-  ++  rule_copy hier env term
+  ++  rule_cpAnn hier env term
 
 rule_var :: Rule
 rule_var hier env term = case term of 
@@ -118,9 +118,9 @@ rule_drop hier env term = case term of
     return (replaceTag (gCutOp hier s s') ty)
   _           -> []
 
-rule_copy :: Rule
-rule_copy hier env term = case term of
-  TCopy t1 t2 -> do
+rule_cpAnn :: Rule
+rule_cpAnn hier env term = case term of
+  TCpAnn t1 t2 -> do
     t1 <- apply_rules hier env t1
     let s1 = tagOf t1
     t2 <- apply_rules hier env t2
