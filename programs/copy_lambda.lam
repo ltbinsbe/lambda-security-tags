@@ -1,0 +1,3 @@
+SecAnn A
+
+(\x:Int<>. copy x true<>) 1 as <A>

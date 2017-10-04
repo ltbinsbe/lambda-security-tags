@@ -1,0 +1,9 @@
+== Interpretation 1 ==
+SecAnn A
+SecAnn B
+(copy true<A> false<B>)
+==
+Types:
+Bool<A,B>
+Evaluation result:
+false<A,B>

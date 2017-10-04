@@ -1,0 +1,4 @@
+SecAnn A
+SecAnn B
+
+copy true<A> false<B>

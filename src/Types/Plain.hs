@@ -11,6 +11,7 @@ data Term     -- computations
               | TITE Term Term Term
               | TLet Var Term Term
               | TAs Term Tag
+              | TCopy Term Term
               | TDrop Term Tag
               -- values / terminals
               | TLam {- \ -} Var {- : -} Type {- . -} Term Tag

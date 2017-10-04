@@ -1,0 +1,8 @@
+== Interpretation 1 ==
+SecAnn A
+((\x : Int<> . (copy x true<>))<> (1<> as <A>))
+==
+Types:
+Bool<>
+Evaluation result:
+true<A>

@@ -17,6 +17,7 @@ subs x v t = case t of
                           False -> subs x v t2
   TAs t1 tag          -> TAs (subs x v t1) tag
   TDrop t1 tag        -> TAs (subs x v t1) tag
+  TCopy t1 t2         -> TCopy (subs x v t1) (subs x v t2)
   TLam y ty t1 tag 
     | x == y          -> TLam y ty t1 tag -- `x` not free in body `t1`
     | otherwise       -> TLam y ty (subs x v t1) tag
@@ -66,6 +67,10 @@ step hier t = case t of
   TAs t1 tag              -> TAs (premise t1) tag
   TDrop t1 tag | isVal t1 -> valRepTag (gCutOp hier (valTagOf t1) tag) t1
   TDrop t1 tag            -> TDrop (premise t1) tag
+  TCopy t1 t2 | isVal t1 && isVal t2 
+      -> valRepTag (tg_prod (valTagOf t1) (valTagOf t2)) t2
+  TCopy t1 t2 | isVal t1  -> TCopy t1 (premise t2)
+  TCopy t1 t2             -> TCopy (premise t1) t2
   TLam _ _ _ _            -> error "step on value"
   TBool _ _               -> error "step on value"
   TInt _ _                -> error "step on value"
