@@ -3,7 +3,8 @@
 
 name:                lambda-security-tags
 version:             0.1.0.0
-synopsis:            Small Lambda Calculus extended with Security Tags. The executable type-checks and executes programs based on an implementation of a formal dynamic and static specification
+synopsis:            Lambda Calculus with Security Tags.
+description:         Small Lambda Calculus extended with Security Tags. The executable type-checks and executes programs based on an implementation of a formal dynamic and static specification
 -- description:         
 license:             MIT
 license-file:        LICENSE
@@ -12,7 +13,9 @@ maintainer:          ltvanbinsbergen@acm.org
 -- copyright:           
 category:            Language
 build-type:          Simple
-extra-source-files:  ChangeLog.md
+extra-source-files:   ChangeLog.md
+                     ,programs/*.output
+                     ,programs/*.lam
 cabal-version:       >=1.10
 
 executable runlam 
